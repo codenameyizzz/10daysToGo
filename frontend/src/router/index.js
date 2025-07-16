@@ -2,12 +2,21 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import DashboardView from '../views/DashboardView.vue';
+import ProfileView from '../views/ProfileView.vue'; 
+import LayoutDefault from '../layouts/LayoutDefault.vue';
 
 const routes = [
   { path: '/login', component: LoginView },
   { path: '/register', component: RegisterView },
-  { path: '/dashboard', component: DashboardView },
-  { path: '/', redirect: '/login' },
+  {
+    path: '/',
+    component: LayoutDefault,
+    children: [
+      { path: 'dashboard', component: DashboardView },
+      { path: 'profile', component: ProfileView },
+    ],
+  },
+  { path: '/:pathMatch(.*)*', redirect: '/login' }, // Catch-all
 ];
 
 const router = createRouter({
@@ -17,22 +26,17 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token');
-  const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
-
   let isTokenValid = false;
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      const now = Math.floor(Date.now() / 1000); // detik
-      isTokenValid = payload.exp > now;
+      isTokenValid = payload.exp > Math.floor(Date.now() / 1000);
     } catch (e) {
       isTokenValid = false;
     }
   }
 
-  console.log('Routing to:', to.path, '| Logged in:', isLoggedIn, '| Token valid:', isTokenValid);
-
-  if (to.path === '/dashboard' && !(isLoggedIn && isTokenValid)) {
+  if (to.path !== '/login' && to.path !== '/register' && !isTokenValid) {
     alert('Harap login dulu');
     next('/login');
   } else {
