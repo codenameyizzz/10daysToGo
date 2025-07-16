@@ -13,14 +13,6 @@
           <el-button type="primary" native-type="submit">Login</el-button>
         </el-form-item>
       </el-form>
-
-      <!-- Tambahan link ke register -->
-      <div style="margin-top: 20px; text-align: center;">
-        <span>Belum punya akun? </span>
-        <el-link type="primary" @click="$router.push('/register')">
-          Daftar di sini
-        </el-link>
-      </div>
     </el-card>
   </div>
 </template>
@@ -41,7 +33,16 @@ export default {
   methods: {
     async submit() {
       try {
-        const res = await axios.post("http://localhost:8000/login", this.form);
+        const formData = new URLSearchParams();
+        formData.append("username", this.form.username);
+        formData.append("password", this.form.password);
+
+        const res = await axios.post("http://localhost:8000/login", formData, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        });
+
         localStorage.setItem("token", res.data.access_token);
         localStorage.setItem("is_logged_in", "true");
         this.$message.success("Login successful!");
