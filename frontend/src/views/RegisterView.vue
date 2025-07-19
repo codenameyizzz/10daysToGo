@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <el-card class="box-card" style="max-width: 400px; margin: 50px auto;">
-      <h2 style="margin-bottom: 20px;">Register</h2>
+    <el-card class="box-card" style="max-width: 400px; margin: 50px auto">
+      <h2 style="margin-bottom: 20px">Register</h2>
       <el-form :model="form" label-position="top" @submit.prevent="submit">
         <el-form-item label="Username">
           <el-input v-model="form.username" />
@@ -37,7 +37,8 @@ export default {
   methods: {
     async submit() {
       try {
-        await axios.post("http://localhost:8000/register", this.form);
+        // Hit the /api/register route
+        await axios.post("http://localhost:8000/api/register", this.form);
         this.$message.success("Register successful! You can login now.");
         this.$router.push("/login");
       } catch (err) {
@@ -49,3 +50,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.container {
+  /* optional centering */
+}
+.box-card {
+  /* optional styling */
+}
+</style>

@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware  # ⬅️ tambahkan ini
+from fastapi.middleware.cors import CORSMiddleware
 from app import users, models
 from app.database import engine
+from app.reviews import router as reviews_router
 
 app = FastAPI()
 
@@ -14,10 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Buat semua tabel yang didefinisikan di models
 models.Base.metadata.create_all(bind=engine)
 
-# Routing
-app.include_router(users.router)
+# Daftarkan router dengan prefix '/api'
+app.include_router(users.router,   prefix="/api", tags=["users"])
+app.include_router(reviews_router, prefix="/api", tags=["reviews"])
 
 @app.get("/")
 def read_root():
